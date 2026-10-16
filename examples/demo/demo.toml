@@ -1,0 +1,54 @@
+# Demo config: stub harness, no model runs. Used by run-demo.sh (repo path is set there).
+[project]
+repo = "../../.vw/demo/target"
+base = "HEAD"
+state_dir = "../../.vw/demo"
+
+[feature]
+name = "slugify"
+spec = "features/slugify/SPEC.md"
+owned = ["src/textkit/slugify/variants/v_{id}/"]
+contract = "Package `textkit.slugify.variants.v_{id}` exporting `slugify(text: str) -> str` and a `VARIANT` dict."
+acceptance_cmd = "PYTHONPATH=src python3 -m unittest discover -s tests/acceptance"
+probe_cmd = "PYTHONPATH=src python3 -m textkit.slugify.probe features/slugify/probes.json"
+integration_branch = "variants/slugify"
+
+[runner]
+harness = "stub"
+max_concurrent = 6
+slot_dir = "../../.vw/demo/slots"
+timeout_s = 60
+retries = 1
+stagger_s = 0.2
+push = false
+
+[[models]]
+id = "opencode/deepseek-v4.1-flash-free"
+short = "deepseek"
+[[models]]
+id = "opencode/glm-5.3-flash-free"
+short = "glm"
+[[models]]
+id = "opencode/mimo-v2.6-flash-free"
+short = "mimo"
+[[models]]
+id = "opencode/nemotron-3-ultra-free"
+short = "nemotron"
+[[models]]
+id = "opencode/muse-spark-1.3-contributor-free"
+short = "muse"
+
+[variants]
+count = 5
+angles = [
+  "locale-aware: transliterate per language (German ä->ae, ß->ss)",
+  "unicode-first: keep letters of every script",
+  "minimal: the smallest correct implementation",
+  "user-facing: symbols become words, drop filler words",
+  "stable-ids: short slug plus a uniqueness suffix",
+]
+
+[prompts]
+base = "../../prompts/base.md"
+diverge = "../../prompts/diverge.md"
+learnings_file = "LEARNINGS.md"
